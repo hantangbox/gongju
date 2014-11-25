@@ -14,8 +14,10 @@ namespace Marksman
         public static Spell Q;
         public static Spell Q2;
         public static Spell W;
+        public static Spell E;
 
         public static bool DoubleHit = false;
+        private static int xAttackLeft = 0;
 
         public Lucian()
         {
@@ -27,41 +29,57 @@ namespace Marksman
 
             Q.SetSkillshot(0.25f, 65f, 1100f, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.30f, 80f, 1600f, true, SkillshotType.SkillshotLine);
+            E = new Spell(SpellSlot.E, 475);
 
             Obj_AI_Base.OnProcessSpellCast += Game_OnProcessSpell;
+            GameObject.OnDelete += GameObject_OnDelete;
         }
 
-        public void Game_OnProcessSpell(Obj_AI_Base unit, GameObjectProcessSpellCastEventArgs spell)
+        public static void GameObject_OnDelete(GameObject sender, EventArgs args)
         {
-            if (!unit.IsMe) return;
-            if (spell.SData.Name.Contains("summoner")) return;
-
-            if (spell.SData.Name.Contains("Attack"))
-            {
-                Utility.DelayAction.Add(50, () =>
-                {
-                    DoubleHit = false;
-                    Utility.DelayAction.ActionList.Clear();
-                });
-
+            /* so ugly code. I'll change later :( */
+            /*
+            return;
+            if (xMustAttackCount > 0 && (sender.Name.Contains("Lucian_P_buf") || sender.Name.Contains("Lucian_AA_mis")))
+            { 
+                xMustAttackCount -= 1;
             }
-            else if (spell.SData.Name.Contains("Lucian") && !spell.SData.Name.Contains("Attack"))
+            */
+        }
+
+        public bool LucianHasPassiveX
+        {
+            get
             {
-                Orbwalking.ResetAutoAttackTimer();
-
-                Utility.DelayAction.Add(6000, () =>
-                {
-                    if (DoubleHit)
-                        DoubleHit = false;
-                });
-
-                DoubleHit = true;
+                return ObjectManager.Player.Buffs.Any(buff => buff.Name == "lucianpassivebuff");
+                //return ObjectManager.Player.Buffs.Any(buff => buff.Name == "lucianpassivebuff") && xMustAttackCount == 0; 
             }
         }
 
-        public bool LucianHasPassive()
+        public static bool IsPositionSafeForE(Obj_AI_Hero target, Spell spell)
         {
-            return Config.Item("Passive" + Id).GetValue<bool>() && DoubleHit;
+            var predPos = spell.GetPrediction(target).UnitPosition.To2D();
+            var myPos = ObjectManager.Player.Position.To2D();
+            var newPos = (target.Position.To2D() - myPos);
+            newPos.Normalize();
+
+            var checkPos = predPos + newPos * (spell.Range - Vector2.Distance(predPos, myPos));
+            Obj_Turret closestTower = null;
+
+            foreach (var tower in ObjectManager.Get<Obj_Turret>()
+                .Where(tower => tower.IsValid && !tower.IsDead && Math.Abs(tower.Health) > float.Epsilon)
+                .Where(tower => Vector3.Distance(tower.Position, ObjectManager.Player.Position) < 1450))
+            {
+                closestTower = tower;
+            }
+
+            if (closestTower == null)
+                return true;
+
+            if (Vector2.Distance(closestTower.Position.To2D(), checkPos) <= 910)
+                return false;
+
+            return true;
         }
 
         public static Obj_AI_Base QMinion
@@ -74,21 +92,21 @@ namespace Marksman
                     MinionOrderTypes.None);
 
                 return (from vMinion in vMinions.Where(vMinion => vMinion.IsValidTarget(Q.Range))
-                    let endPoint =
-                        vMinion.ServerPosition.To2D()
-                            .Extend(ObjectManager.Player.ServerPosition.To2D(), -Q2.Range)
-                            .To3D()
-                    where
-                        Intersection(
-                            ObjectManager.Player.ServerPosition.To2D(), endPoint.To2D(), vTarget.ServerPosition.To2D(),
-                            vTarget.BoundingRadius + Q.Width / 2)
-                    select vMinion).FirstOrDefault();
+                        let endPoint =
+                            vMinion.ServerPosition.To2D()
+                                .Extend(ObjectManager.Player.ServerPosition.To2D(), -Q2.Range)
+                                .To3D()
+                        where
+                            vMinion.Distance(vTarget) <= vTarget.Distance(ObjectManager.Player) &&
+                            Intersection(ObjectManager.Player.ServerPosition.To2D(), endPoint.To2D(),
+                                vTarget.ServerPosition.To2D(), vTarget.BoundingRadius + Q.Width / 4)
+                        select vMinion).FirstOrDefault();
             }
         }
 
         public override void Drawing_OnDraw(EventArgs args)
         {
-            Spell[] spellList = { Q, W };
+            Spell[] spellList = { Q, Q2, W, E };
             foreach (var spell in spellList)
             {
                 var menuItem = GetValue<Circle>("Draw" + spell.Slot);
@@ -96,14 +114,9 @@ namespace Marksman
 
                 Utility.DrawCircle(ObjectManager.Player.Position, spell.Range, menuItem.Color);
             }
-
-            if (!GetValue<Circle>("DrawQ2").Active && Q.Level < 0) return;
-
-            Utility.DrawCircle(ObjectManager.Player.Position, Q2.Range, GetValue<Circle>("DrawQ2").Color);
         }
 
         public static bool Intersection(Vector2 p1, Vector2 p2, Vector2 pC, float radius)
-            /* Credits to DETUKS https://github.com/detuks/LeagueSharp/blob/master/YasuoSharp/YasMath.cs */
         {
             var p3 = new Vector2(pC.X + radius, pC.Y + radius);
 
@@ -117,20 +130,45 @@ namespace Marksman
             return d > 0;
         }
 
+        public void Game_OnProcessSpell(Obj_AI_Base unit, GameObjectProcessSpellCastEventArgs spell)
+        {
+            if (!unit.IsMe) return;
+            if (spell.SData.Name.Contains("summoner")) return;
+            if (!Config.Item("Passive" + Id).GetValue<bool>()) return;
+            
+            if (spell.SData.Name.ToLower().Contains("lucianq") || spell.SData.Name.ToLower().Contains("lucianw") ||
+                spell.SData.Name.ToLower().Contains("luciane") || spell.SData.Name.ToLower().Contains("lucianr")) 
+            {
+                xAttackLeft = 2;
+                return;
+            }
+
+            if (spell.SData.Name.ToLower().Contains("lucian") && spell.SData.Name.ToLower().Contains("attack"))
+            {
+                xAttackLeft -= 1;
+                return;
+            }
+        }
+
         public override void Game_OnGameUpdate(EventArgs args)
         {
+            if (ObjectManager.Player.IsDead)
+                return;
 
-            if (Q.IsReady() && GetValue<KeyBind>("UseQTH").Active)
+            if (Config.Item("Passive" + Id).GetValue<bool>() && xAttackLeft > 0)
+                return;
+
+            if (Q.IsReady() && GetValue<KeyBind>("UseQTH").Active && ToggleActive)
             {
                 if (ObjectManager.Player.HasBuff("Recall"))
                     return;
 
                 var t = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
-                if (t != null && !LucianHasPassive())
+                if (t != null)
                     Q.CastOnUnit(t);
             }
 
-            if (Q.IsReady() && GetValue<KeyBind>("UseQExtendedTH").Active)
+            if (Q.IsReady() && GetValue<KeyBind>("UseQExtendedTH").Active && ToggleActive)
             {
                 if (ObjectManager.Player.HasBuff("Recall"))
                     return;
@@ -138,7 +176,7 @@ namespace Marksman
                 var t = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
                 if (t.IsValidTarget() && QMinion.IsValidTarget())
                 {
-                    if (ObjectManager.Player.Distance(t) > ObjectManager.Player.AttackRange)
+                    if (!Orbwalking.InAutoAttackRange(t))
                         Q.CastOnUnit(QMinion);
                 }
             }
@@ -147,86 +185,90 @@ namespace Marksman
 
             var useQ = Config.Item("UseQ" + (ComboActive ? "C" : "H") + Id).GetValue<bool>();
             var useW = Config.Item("UseW" + (ComboActive ? "C" : "H") + Id).GetValue<bool>();
+            var useE = Config.Item("UseE" + (ComboActive ? "C" : "H") + Id).GetValue<bool>();
             var useQExtended = Config.Item("UseQExtended" + (ComboActive ? "C" : "H") + Id).GetValue<bool>();
 
             if (ObjectManager.Player.Spellbook.GetSpell(SpellSlot.R).Level > 0)
                 Config.Item("GHOSTBLADE")
                     .SetValue(ObjectManager.Player.Spellbook.GetSpell(SpellSlot.R).Name == "LucianR");
 
-            if (useQExtended)
+            if (useQExtended && Q.IsReady())
             {
-                var vTarget = SimpleTs.GetTarget(Q2.Range, SimpleTs.DamageType.Physical);
-
-                if (vTarget.IsValidTarget() && QMinion.IsValidTarget())
+                var t = SimpleTs.GetTarget(Q2.Range, SimpleTs.DamageType.Physical);
+                if (t.IsValidTarget() && QMinion.IsValidTarget())
                 {
-                    if (ObjectManager.Player.Distance(vTarget) > ObjectManager.Player.AttackRange)
+                    if (!Orbwalking.InAutoAttackRange(t))
                         Q.CastOnUnit(QMinion);
                 }
             }
 
-            if (useQ)
+            if (useQ && Q.IsReady())
             {
-                var vTarget = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
-
-                if (vTarget.IsValidTarget())
+                var t = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
+                if (t.IsValidTarget())
                 {
-                    if (!LucianHasPassive())
-                        Q.CastOnUnit(vTarget);
+                    Q.CastOnUnit(t);
                 }
             }
 
-            if (useW)
+            if (useW && W.IsReady())
             {
-                var vTarget = SimpleTs.GetTarget(W.Range, SimpleTs.DamageType.Physical);
-
-                if (vTarget.IsValidTarget())
+                var t = SimpleTs.GetTarget(W.Range, SimpleTs.DamageType.Physical);
+                if (t.IsValidTarget())
                 {
-                    if (ObjectManager.Player.Distance(vTarget) <= ObjectManager.Player.AttackRange)
-                    {
-                        if (!LucianHasPassive())
-                            W.Cast(vTarget);
-                    }
-                    else
-                        W.Cast(vTarget);
+                    W.Cast(t);
+                }
+            }
+
+            if (useE && E.IsReady())
+            {
+                var t = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
+                if (t != null)
+                {
+                    E.Cast(Game.CursorPos);
                 }
             }
         }
 
         public override bool ComboMenu(Menu config)
         {
-            config.AddItem(new MenuItem("UseQC" + Id, "浣跨敤 Q").SetValue(true));
-            config.AddItem(new MenuItem("UseWC" + Id, "浣跨敤 W").SetValue(true));
-            config.AddItem(new MenuItem("UseQExtendedC" + Id, "鏋侀檺璺濈Q").SetValue(true));
+            config.AddItem(new MenuItem("UseQC" + Id, "浣跨敤 QA").SetValue(true));
+            config.AddItem(new MenuItem("UseQExtendedC" + Id, "浣跨敤 EAQA").SetValue(true));
+            config.AddItem(new MenuItem("Cx", ""));
+            config.AddItem(new MenuItem("UseWC" + Id, "浣跨敤 WA").SetValue(true));
+            config.AddItem(new MenuItem("UseEC" + Id, "浣跨敤 EA").SetValue(true));
             return true;
         }
 
         public override bool HarassMenu(Menu config)
         {
-            config.AddItem(new MenuItem("UseQH" + Id, "浣跨敤Q").SetValue(true));
+            config.AddItem(new MenuItem("UseQH" + Id, "浣跨敤 Q").SetValue(true));
             config.AddItem(
-                new MenuItem("UseQTH" + Id, "浣跨敤 Q(鎸佺画)").SetValue(new KeyBind("T".ToCharArray()[0],
+                new MenuItem("UseQTH" + Id, "浣跨敤 Q (鑷姩)").SetValue(new KeyBind("T".ToCharArray()[0],
                     KeyBindType.Toggle)));
-
+            config.AddItem(new MenuItem("Cx",""));
+            config.AddItem(new MenuItem("UseQExtendedH" + Id, "浣跨敤 EQ").SetValue(true));
+            config.AddItem(
+                new MenuItem("UseQExtendedTH" + Id, "浣跨敤 EQ (鑷姩)").SetValue(new KeyBind("H".ToCharArray()[0],
+                    KeyBindType.Toggle)));
+            config.AddItem(new MenuItem("Cx", ""));
             config.AddItem(new MenuItem("UseWH" + Id, "浣跨敤 W").SetValue(true));
-            config.AddItem(new MenuItem("UseQExtendedH" + Id, "鏋侀檺璺濈Q").SetValue(true));
-            config.AddItem(
-                new MenuItem("UseQExtendedTH" + Id, "鏋侀檺璺濈Q(鎸佺画)").SetValue(new KeyBind("H".ToCharArray()[0],
-                    KeyBindType.Toggle)));
             return true;
         }
 
         public override bool MiscMenu(Menu config)
         {
-            config.AddItem(new MenuItem("Passive" + Id, "鑷姩鎶€鑳藉埛琚姩").SetValue(true));
+            config.AddItem(new MenuItem("Passive" + Id, "鑷姩鍒锋柊琚姩").SetValue(true));
             return true;
         }
-       
+
         public override bool DrawingMenu(Menu config)
         {
-            config.AddItem(new MenuItem("DrawQ" + Id, "Q 鑼冨洿").SetValue(new Circle(true, Color.CornflowerBlue)));
-            config.AddItem(
-                new MenuItem("DrawQ2" + Id, "鏋侀檺璺濈Q 鑼冨洿").SetValue(new Circle(true, Color.CornflowerBlue)));
-            config.AddItem(new MenuItem("DrawW" + Id, "W 鑼冨洿").SetValue(new Circle(false, Color.CornflowerBlue)));
+            config.AddItem(new MenuItem("DrawQ" + Id, "Q 鑼冨洿").SetValue(new Circle(true, Color.Gray)));
+            config.AddItem(new MenuItem("DrawQ2" + Id, "EQ 鑼冨洿").SetValue(new Circle(true, Color.Gray)));
+            config.AddItem(new MenuItem("DrawW" + Id, "W 鑼冨洿").SetValue(new Circle(false, Color.Gray)));
+            config.AddItem(new MenuItem("DrawE" + Id, "E 鑼冨洿").SetValue(new Circle(false, Color.Gray)));
+
             return true;
         }
 
@@ -236,5 +278,10 @@ namespace Marksman
             return true;
         }
 
+        public override bool LaneClearMenu(Menu config)
+        {
+
+             return true;
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace Marksman
 
         public MissFortune()
         {
-            Utils.PrintMessage("MissFortune loaded 姹夊寲by浜岀嫍!QQ缇361630847.");
+            Utils.PrintMessage("MissFortune loaded.姹夊寲by浜岀嫍!QQ缇361630847.");
 
             Q = new Spell(SpellSlot.Q, 650);
             Q.SetTargetted(0.29f, 1400f);
@@ -53,20 +53,48 @@ namespace Marksman
             }
         }
 
+        private static void CastQ()
+        {
+            if (!Q.IsReady())
+                return;
+
+            var t = SimpleTs.GetTarget(Q.Range + 450, SimpleTs.DamageType.Physical);
+            if (t.IsValidTarget(Q.Range))
+            {
+                Q.CastOnUnit(t);
+                return;
+            }
+
+            var vMinions = MinionManager.GetMinions(t.Position, Q.Range, MinionTypes.All, MinionTeam.NotAlly);
+            Obj_AI_Base[] nearstMinion = { null };
+            foreach (
+                var vMinion in
+                    vMinions.Where(
+                        minion =>
+                            minion.Distance(ObjectManager.Player) <= t.Distance(ObjectManager.Player) &&
+                            t.Distance(minion) < 400)
+                        .Where(
+                            minion =>
+                                nearstMinion[0] == null ||
+                                minion.Distance(ObjectManager.Player) < nearstMinion[0].Distance(ObjectManager.Player)))
+                
+                nearstMinion[0] = vMinion;
+            if (nearstMinion[0] != null && nearstMinion[0].IsValidTarget(Q.Range))
+                Q.CastOnUnit(nearstMinion[0]);
+        }
+
         public override void Game_OnGameUpdate(EventArgs args)
         {
             if (Q.IsReady() && GetValue<KeyBind>("UseQTH").Active)
             {
-                if(ObjectManager.Player.HasBuff("Recall"))
+                if (ObjectManager.Player.HasBuff("Recall"))
                     return;
-                var t = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
-                if (t != null)
-                    Q.Cast(t);
+                CastQ();
             }
-                
+
             if (E.IsReady() && GetValue<KeyBind>("UseETH").Active)
             {
-                if(ObjectManager.Player.HasBuff("Recall"))
+                if (ObjectManager.Player.HasBuff("Recall"))
                     return;
                 var t = Orbwalker.GetTarget() ??
                         SimpleTs.GetTarget(E.Range + E.Range / 2, SimpleTs.DamageType.Physical);
@@ -84,12 +112,7 @@ namespace Marksman
                 {
                     if (Q.IsReady() && useQ)
                     {
-                        var vTarget = Orbwalker.GetTarget() ?? 
-                                      SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
-                        if (vTarget != null)
-                        {
-                            Q.CastOnUnit(vTarget);
-                        }
+                        CastQ();
                     }
 
                     if (E.IsReady() && useE)
@@ -101,6 +124,21 @@ namespace Marksman
                     }
                 }
             }
+            if (LaneClearActive)
+            {
+                bool useQ = GetValue<bool>("UseQL");
+
+                if (Q.IsReady() && useQ)
+                {
+                    var vMinions = MinionManager.GetMinions(ObjectManager.Player.Position, Q.Range);
+                    foreach (
+                        Obj_AI_Base minions in
+                            vMinions.Where(
+                                minions => minions.Health < ObjectManager.Player.GetSpellDamage(minions, SpellSlot.Q)))
+                        Q.Cast(minions);
+                }
+            }
+            
         }
 
         public override bool ComboMenu(Menu config)
@@ -143,6 +181,11 @@ namespace Marksman
         public override bool ExtrasMenu(Menu config)
         {
 
+            return true;
+        }
+        public override bool LaneClearMenu(Menu config)
+        {
+            config.AddItem(new MenuItem("UseQL" + Id, "浣跨敤 Q").SetValue(true));
             return true;
         }
 

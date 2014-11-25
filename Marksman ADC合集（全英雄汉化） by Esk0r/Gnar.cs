@@ -1,4 +1,4 @@
-﻿#region
+#region
 using System;
 using System.Drawing;
 using System.Linq;
@@ -78,28 +78,40 @@ namespace Marksman
             }
         }
 
-        public override void ComboMenu(Menu config)
+        public override bool ComboMenu(Menu config)
         {
             config.AddItem(new MenuItem("UseQC" + Id, "浣跨敤 Q").SetValue(true));
             config.AddItem(new MenuItem("UseWC" + Id, "浣跨敤 W").SetValue(true));
+            return true;
         }
 
-        public override void HarassMenu(Menu config)
+        public override bool HarassMenu(Menu config)
         {
             config.AddItem(new MenuItem("UseQH" + Id, "浣跨敤 Q").SetValue(false));
             config.AddItem(new MenuItem("UseWH" + Id, "浣跨敤 W").SetValue(false));
+            return true;
         }
 
-        public override void DrawingMenu(Menu config)
+        public override bool DrawingMenu(Menu config)
         {
             config.AddItem(
                 new MenuItem("DrawQ" + Id, "Q 鑼冨洿").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
-
             config.AddItem(
                 new MenuItem("DrawW" + Id, "W 鑼冨洿").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
- 
             config.AddItem(
                 new MenuItem("DrawE" + Id, "E 鑼冨洿").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
+            return true;
+        }
+        public override bool ExtrasMenu(Menu config)
+        {
+
+            return true;
+        }
+
+        public override bool LaneClearMenu(Menu config)
+        {
+
+             return true;
         }
     }
 }

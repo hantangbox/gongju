@@ -80,8 +80,10 @@
     <Compile Include="Corki.cs" />
     <Compile Include="Draven.cs" />
     <Compile Include="Ezreal.cs" />
+    <Compile Include="Gnar.cs" />
     <Compile Include="Graves.cs" />
     <Compile Include="Jinx.cs" />
+    <Compile Include="Kalista.cs" />
     <Compile Include="Kogmaw.cs" />
     <Compile Include="PotionManager.cs" />
     <Compile Include="Program.cs" />
@@ -99,6 +101,7 @@
     <Compile Include="Tristana.cs" />
     <Compile Include="Twitch.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="Urgot.cs" />
     <Compile Include="Varus.cs" />
     <Compile Include="Vayne.cs" />
   </ItemGroup>
