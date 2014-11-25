@@ -1,0 +1,74 @@
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# =========================
+# Operating System Files
+# =========================
+
+# OSX
+# =========================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+LeagueSharp.sln
+LeagueSharp.v12.suo
+*.dll
+*.exe
+*.manifest
+*.cache
+*.pdb
+DevAnnie/bin/*
+DevAnnie/obj/*
+DevBrand/bin/*
+DevBrand/obj/*
+DevCassio/bin/*
+DevCassio/obj/*
+DevCommom/bin/*
+DevCommom/obj/*
+DevDebug/bin/*
+DevDebug/obj/*
+DevKarma/bin/*
+DevKarma/obj/*
+DevKogMaw/bin/*
+DevKogMaw/obj/*
+DevLulu/bin/*
+DevLulu/obj/*
+DevRyze/bin/*
+DevRyze/obj/*
+DevTwitch/bin/*
+DevTwitch/obj/*
+DevCassio/FakesAssemblies/DevCommom.Fakes.fakesconfig
+DevCassio/FakesAssemblies/DevCommom.Fakes.messages
+DevCassio/FakesAssemblies/DevCommom.Fakes.xml
