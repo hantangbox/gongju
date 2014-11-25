@@ -22,7 +22,7 @@ namespace Marksman
 
         private static void Game_OnGameLoad(EventArgs args)
         {
-            Config = new Menu("Marksman", "Marksman", true);
+            Config = new Menu("ADC鍚堥泦", "Marksman", true);
             CClass = new Champion();
             AActivator = new Activator();
             
@@ -110,7 +110,7 @@ namespace Marksman
             items.AddItem(new MenuItem("BOTRK", "鐮磋触鐜嬭€呬箣鍒億").SetValue(true));
             items.AddItem(new MenuItem("GHOSTBLADE", "骞芥ⅵ涔嬬伒").SetValue(true));
             items.AddItem(new MenuItem("SWORD", "绁炲湥涔嬪墤").SetValue(true));
-            QuickSilverMenu = new Menu("QSS", "姘撮摱绯诲甫");
+            QuickSilverMenu = new Menu("姘撮摱绯诲甫", "QuickSilverSash");
             items.AddSubMenu(QuickSilverMenu);
             QuickSilverMenu.AddItem(new MenuItem("AnyStun", "瑙ｉ櫎鐪╂檿").SetValue(true));
             QuickSilverMenu.AddItem(new MenuItem("AnySnare", "瑙ｉ櫎闄烽槺").SetValue(true));
@@ -124,8 +124,8 @@ namespace Marksman
                 }
             }
             items.AddItem(
-                new MenuItem("UseItemsMode", "浣跨敤妯″紡").SetValue(
-                    new StringList(new[] {"绂佺敤", "娣峰悎", "杩炴嫑", "鍚屾椂"}, 2)));
+                new MenuItem("UseItemsMode", "鐗╁搧浣跨敤").SetValue(
+                    new StringList(new[] {"绂佺敤", "鎺х嚎", "杩炴嫑", "閫氱敤"}, 2)));
 
             
             //var Extras = Config.AddSubMenu(new Menu("Extras", "Extras"));
@@ -143,7 +143,7 @@ namespace Marksman
                 var harass = new Menu("楠氭壈", "Harass");
                 if (CClass.HarassMenu(harass))
                 {
-                    harass.AddItem(new MenuItem("HarassMana", "楠氭壈鏈€浣庤摑閲弢").SetValue(new Slider(50, 100, 0)));
+                    harass.AddItem(new MenuItem("HarassMana", "楠氭壈锛堟硶鍔涘€硷級").SetValue(new Slider(50, 100, 0)));
                     Config.AddSubMenu(harass);
                 }
 
@@ -151,7 +151,7 @@ namespace Marksman
                 if (CClass.LaneClearMenu(laneclear))
                 {
                     laneclear.AddItem(
-                        new MenuItem("LaneClearMana", "娓呯嚎鏈€浣庤摑閲弢").SetValue(new Slider(50, 100, 0)));
+                        new MenuItem("LaneClearMana", "娓呯嚎锛堟硶鍔涘€硷級").SetValue(new Slider(50, 100, 0)));
                     Config.AddSubMenu(laneclear);
                 }
 
