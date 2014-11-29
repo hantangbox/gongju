@@ -21,7 +21,7 @@ namespace Tracker
 
         static void Main(string[] args)
         {
-            Config = new Menu("|杩借釜鍣▅", "Tracker", true);
+            Config = new Menu("追蹤器", "Tracker", true);
             HbTracker.AttachToMenu(Config);
             WardTracker.AttachToMenu(Config);
             Config.AddToMainMenu();

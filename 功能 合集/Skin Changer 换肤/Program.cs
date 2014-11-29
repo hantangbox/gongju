@@ -158,9 +158,9 @@ namespace Skin_Changer
             numSkins.Add("Zilean", 4);
             numSkins.Add("Zyra", 3);
 
-            Config = new Menu("鐨偆鏇存崲", "SkinChanger", true);
-            var ChangeSkin = Config.AddItem(new MenuItem("CycleSkins", "寰幆 鐨偆（鎸墊9）!").SetValue(new KeyBind("9".ToCharArray()[0], KeyBindType.Toggle)));
-            Config.AddItem(new MenuItem("cChange", "鍚敤 鎹㈣偆").SetValue(new KeyBind("I".ToCharArray()[0], KeyBindType.Toggle)));
+            Config = new Menu("皮膚更換", "SkinChanger", true);
+            var ChangeSkin = Config.AddItem(new MenuItem("CycleSkins", "切換皮膚（數字9）!").SetValue(new KeyBind("9".ToCharArray()[0], KeyBindType.Toggle)));
+            Config.AddItem(new MenuItem("cChange", "啟用 換膚").SetValue(new KeyBind("I".ToCharArray()[0], KeyBindType.Toggle)));
 
             ChangeSkin.ValueChanged += delegate(object sender, OnValueChangeEventArgs EventArgs)
             {

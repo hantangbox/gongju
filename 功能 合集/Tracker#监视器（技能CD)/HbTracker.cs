@@ -84,10 +84,10 @@ namespace Tracker
 
         public static void AttachToMenu(Menu menu)
         {
-            Config = menu.AddSubMenu(new Menu("CD 鐩戣", "CD Tracker"));
-            Config.AddItem(new MenuItem("TrackAllies", "鏄剧ず 鐩熷弸").SetValue(true));
-            Config.AddItem(new MenuItem("TrackEnemies", "鏄剧ず 鏁屼汉").SetValue(true));
-            Config.AddItem(new MenuItem("TrackMe", "鏄剧ず 鑷繁").SetValue(false));
+            Config = menu.AddSubMenu(new Menu("CD 監視", "CD Tracker"));
+            Config.AddItem(new MenuItem("TrackAllies", "顯示 盟友").SetValue(true));
+            Config.AddItem(new MenuItem("TrackEnemies", "顯示 隊友").SetValue(true));
+            Config.AddItem(new MenuItem("TrackMe", "顯示 自己").SetValue(false));
         }
 
         private static Texture GetSummonerTexture(string name)

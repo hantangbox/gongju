@@ -91,14 +91,14 @@ namespace Killability
             {
             }
 
-            _config = new Menu("鍑绘潃鎻愮ず", "Killability", true);
-            _config.AddItem(new MenuItem("icon", "鍙嚮鏉€鏄剧ず鍥炬").SetValue(true));
-            _config.AddItem(new MenuItem("text", "鍙嚮鏉€鏂囧瓧鎻愮ず").SetValue(true));
+            _config = new Menu("擊殺提示", "Killability", true);
+            _config.AddItem(new MenuItem("icon", "可擊殺顯示圖案").SetValue(true));
+            _config.AddItem(new MenuItem("text", "可擊殺文字提示").SetValue(true));
             _config.AddToMainMenu();
 
             InitDrawing();
 
-            Game.PrintChat("Killability by h3h3 鍔犺浇鎴愬姛!姹夊寲by浜岀嫍!QQ缇361630847.");
+            Game.PrintChat("鎿婃鎻愮ず by h3h3 鍔犺浇鎴愬姛!姹夊寲by浜岀嫍!QQ缇361630847.");
         }
 
         private void InitDrawing()

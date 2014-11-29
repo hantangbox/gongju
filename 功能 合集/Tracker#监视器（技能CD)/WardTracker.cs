@@ -389,9 +389,9 @@ namespace Tracker
 
         public static void AttachToMenu(Menu menu)
         {
-            Config = menu.AddSubMenu(new Menu("鍏ㄥ浘 鐩戣", "Ward Tracker"));
-            Config.AddItem(new MenuItem("Details", "鏄剧ず 鏇村 淇℃伅").SetValue(new KeyBind(16, KeyBindType.Press)));
-            Config.AddItem(new MenuItem("Enabled", "鍚敤").SetValue(true));
+            Config = menu.AddSubMenu(new Menu("全圖 監視", "Ward Tracker"));
+            Config.AddItem(new MenuItem("Details", "顯示更多信息").SetValue(new KeyBind(16, KeyBindType.Press)));
+            Config.AddItem(new MenuItem("Enabled", "啟用").SetValue(true));
         }
 
         private static void ObjSpellMissileOnOnCreate(GameObject sender, EventArgs args)

@@ -30,16 +30,16 @@ namespace meta_Smite
         {
             Game.PrintChat("Starting load of Meta Smite");
             setSmiteSlot();
-           Config = new Menu("meta鎯╂垝", "metaSmite", true);
-            Config.AddItem(new MenuItem("Enabled", "鍚敤 鍒囨崲").SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle, true)));
-            Config.AddItem(new MenuItem("EnabledH", "鍚敤 淇濆瓨").SetValue(new KeyBind("K".ToCharArray()[0], KeyBindType.Press)));
-            Config.AddItem(new MenuItem("DrawStatus", "鏄剧ず 鐘舵€亅").SetValue(true));
+           Config = new Menu("meta懲戒", "metaSmite", true);
+            Config.AddItem(new MenuItem("Enabled", "啟用 切換").SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle, true)));
+            Config.AddItem(new MenuItem("EnabledH", "啟用 保存 ").SetValue(new KeyBind("K".ToCharArray()[0], KeyBindType.Press)));
+            Config.AddItem(new MenuItem("DrawStatus", "顯示 狀態").SetValue(true));
             //Config.AddItem(new MenuItem("SmiteCast", "Cast smite using packet")).SetValue(true);
             Config.AddToMainMenu();
             champSpell = addSupportedChampSkill();
             if (smiteSlot == SpellSlot.Unknown && champSpell.Slot == SpellSlot.Unknown)
             {
-                Game.PrintChat("Smite and spell not found, disabling Meta Smite 鍔犺浇鎴愬姛!姹夊寲by浜岀嫍!QQ缇361630847");
+                Game.PrintChat("Smite and spell not found, disabling Meta Smite 鍔犺級鎴愬姛!婕㈠寲by浜岀嫍!QQ缇361630847.");
                 return;
             }
             setupCampMenu();
@@ -551,27 +551,27 @@ namespace meta_Smite
 
         public static void setupCampMenu()
         {
-            Config.AddSubMenu(new Menu("閲庡尯璁剧疆", "Camps"));
+            Config.AddSubMenu(new Menu("野區設置", "Camps"));
             if(Game.MapId == GameMapId.TwistedTreeline)
             {
-                Config.SubMenu("Camps").AddItem(new MenuItem("TT_Spiderboss", "灏忓菇鐏祙鍚敤").SetValue(true));
-                Config.SubMenu("Camps").AddItem(new MenuItem("TT_NGolem", "鐭冲ご浜簗鍚敤").SetValue(true));
-                Config.SubMenu("Camps").AddItem(new MenuItem("TT_NWolf", "涓夌嫾|鍚敤").SetValue(true));
-                Config.SubMenu("Camps").AddItem(new MenuItem("TT_NWraith", "澶у菇鐏祙鍚敤").SetValue(true));
+                Config.SubMenu("Camps").AddItem(new MenuItem("TT_Spiderboss", "懲戒 小幽靈").SetValue(true));
+                Config.SubMenu("Camps").AddItem(new MenuItem("TT_NGolem", "懲戒石頭人").SetValue(true));
+                Config.SubMenu("Camps").AddItem(new MenuItem("TT_NWolf", "懲戒 三狼").SetValue(true));
+                Config.SubMenu("Camps").AddItem(new MenuItem("TT_NWraith", "懲戒 大幽靈").SetValue(true));
             }
 			if (Game.MapId == (GameMapId)11)
 			{
                 //start by SKO
-				Config.SubMenu("Camps").AddItem(new MenuItem("SRU_BaronSpawn", "澶ч緳 鍚敤").SetValue(true));
-				Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Dragon", "灏忛緳 鍚敤").SetValue(true));
-				Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Blue", "钃漛uff 鍚敤").SetValue(true));
-				Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Red", "绾uff 鍚敤").SetValue(true));
+				Config.SubMenu("Camps").AddItem(new MenuItem("SRU_BaronSpawn", "懲戒 大龍").SetValue(true));
+				Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Dragon", "懲戒 小龍").SetValue(true));
+				Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Blue", "懲戒 藍buff").SetValue(true));
+				Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Red", "懲戒 紅buff").SetValue(true));
                 //end
-                Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Gromp", "鐭崇敳铏玝uff 鍚敤").SetValue(false));
-                Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Murkwolf", "鏆楀奖鐙糱uff 鍚敤").SetValue(false));
-                Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Krug", "榄旀布铔檅uff 鍚敤").SetValue(false));
-                Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Razorbeak", "閿嬪枡楦焍uff 鍚敤").SetValue(false));
-                Config.SubMenu("Camps").AddItem(new MenuItem("Sru_Crab", "铻冭煿buff 鍚敤").SetValue(false));
+                Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Gromp", "懲戒 石甲蟲buff").SetValue(false));
+                Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Murkwolf", "懲戒 暗影狼buff").SetValue(false));
+                Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Krug", "懲戒 魔沼蛙buff").SetValue(false));
+                Config.SubMenu("Camps").AddItem(new MenuItem("SRU_Razorbeak", "懲戒 鋒喙鳥buff").SetValue(false));
+                Config.SubMenu("Camps").AddItem(new MenuItem("Sru_Crab", "懲戒 河蟹buff").SetValue(false));
 			}
         }
 
