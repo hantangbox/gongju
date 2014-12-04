@@ -95,8 +95,8 @@ namespace TeachingLeagueSharp
             R = new Spell(SpellSlot.R);
             //Game.PrintChat("in1");
             ts = new TargetSelector(1025, TargetSelector.TargetingMode.AutoPriority);
-            stufftosay = new[] { "馬上回來", "回去補給下", "回家買裝備" };
-            deaths = new[] { "我的天", "這遊戲太難了", "好好來一次，速度推了", "延遲....我卡了" };
+            stufftosay = new[] { "棣笂鍥炰締", "鍥炲幓瑁滅郸", "鍥炲璨疯鍌欏暒" };
+            deaths = new[] { "鎴戠殑澶╁摢", "這遊戲太難了", "濂藉ソ渚嗕竴娆★紝閫熷害鎺ㄤ簡", "寤堕伈 ....鎴戝崱" };
             spawn =
                 ObjectManager.Get<GameObject>()
                     .First(x => x.Type == GameObjectType.obj_SpawnPoint && x.Team == ObjectManager.Player.Team)
