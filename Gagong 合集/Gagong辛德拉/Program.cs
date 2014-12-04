@@ -25,6 +25,11 @@ namespace GagongSyndra
         private static SoundPlayer ilovethisgame = new SoundPlayer(GagongSyndra.Properties.Resources.ILoveThisGame);
         private static int LastPlayedSound = 0;
 
+        //Collision
+        private static int WallCastT;
+        private static Vector2 YasuoWallCastedPos;
+        private static GameObject YasuoWall;
+
         //Create spells
         private static List<Spell> SpellList = new List<Spell>();
         private static Spell Q;
@@ -65,10 +70,10 @@ namespace GagongSyndra
             
             //Spells data
             Q = new Spell(SpellSlot.Q, 800);
-            Q.SetSkillshot(0.74f, 125f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.65f, 120f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
-            W = new Spell(SpellSlot.W, 930);
-            W.SetSkillshot(0.25f, 140f, 1400f, false, SkillshotType.SkillshotCircle);
+            W = new Spell(SpellSlot.W, 925);
+            W.SetSkillshot(0.75f, 120f, 1500f, false, SkillshotType.SkillshotCircle);
 
             E = new Spell(SpellSlot.E, 700);
             E.SetSkillshot(0.25f, (float)(45 * 0.5), 2500, false, SkillshotType.SkillshotCone);         
@@ -77,7 +82,7 @@ namespace GagongSyndra
             R.SetTargetted(0.5f, 1100f);
 
             QE = new Spell(SpellSlot.E, 1292);
-            QE.SetSkillshot(0.98f, 50f, 5500f, false, SkillshotType.SkillshotLine);
+            QE.SetSkillshot(0.98f, 55f, 9000f, false, SkillshotType.SkillshotLine);
 
 
             IgniteSlot = Player.GetSpellSlot("SummonerDot");
@@ -117,7 +122,7 @@ namespace GagongSyndra
             Menu.SubMenu("Harass").AddItem(new MenuItem("UseWH", "使用 W").SetValue(false));
             Menu.SubMenu("Harass").AddItem(new MenuItem("UseEH", "使用 E").SetValue(false));
             Menu.SubMenu("Harass").AddItem(new MenuItem("UseQEH", "使用 QE").SetValue(false));
-            Menu.SubMenu("Harass").AddItem(new MenuItem("HarassMana", "騷擾最小藍量").SetValue(new Slider(0, 0, 100)));
+            Menu.SubMenu("Harass").AddItem(new MenuItem("HarassMana", "騷擾最少藍量").SetValue(new Slider(0, 0, 100)));
             Menu.SubMenu("Harass").AddItem(new MenuItem("HarassActiveT", "騷擾 (自動)!").SetValue(new KeyBind("Y".ToCharArray()[0], KeyBindType.Toggle,true)));
 
             //Farming menu:
@@ -159,8 +164,9 @@ namespace GagongSyndra
             if (Menu.Item("Orbwalker_Mode").GetValue<bool>()) Menu.SubMenu("Misc").AddItem(new MenuItem("OrbWAA", "使用 走砍").SetValue(true));
             Menu.SubMenu("Misc").AddItem(new MenuItem("Sound1", "加載 聲音提示").SetValue(true));
             Menu.SubMenu("Misc").AddItem(new MenuItem("Sound2", "進遊戲 聲音提示").SetValue(true));
-
-            //QE Settings
+            Menu.SubMenu("Misc").AddItem(new MenuItem("YasuoWall", "不使用技能|亞索的W").SetValue(true));
+            
+			//QE Settings
             Menu.AddSubMenu(new Menu("QE 設置", "QEsettings"));
             Menu.SubMenu("QEsettings").AddItem(new MenuItem("QEDelay", "QE 延遲").SetValue(new Slider(0, 0, 150)));
             Menu.SubMenu("QEsettings").AddItem(new MenuItem("QEMR", "QE 最大範圍 %").SetValue(new Slider(100, 0, 100)));
@@ -178,10 +184,20 @@ namespace GagongSyndra
             Menu.SubMenu("Rsettings").AddSubMenu(new Menu("禁用 R", "DontR"));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
                 Menu.SubMenu("Rsettings").SubMenu("DontR").AddItem(new MenuItem("DontR" + enemy.BaseSkinName, enemy.BaseSkinName).SetValue(false));
-            Menu.SubMenu("Rsettings").AddSubMenu(new Menu("擊殺 提示", "okR"));
+            Menu.SubMenu("Rsettings").AddSubMenu(new Menu("禁用R|對以下目標", "DontRbuff"));
+            Menu.SubMenu("Rsettings").SubMenu("DontRbuff").AddItem(new MenuItem("DontRbuffUndying", "蠻王大招").SetValue(true));
+            Menu.SubMenu("Rsettings").SubMenu("DontRbuff").AddItem(new MenuItem("DontRbuffJudicator", "天使大招").SetValue(true));
+            Menu.SubMenu("Rsettings").SubMenu("DontRbuff").AddItem(new MenuItem("DontRbuffAlistar", "基蘭大招").SetValue(true));
+            Menu.SubMenu("Rsettings").SubMenu("DontRbuff").AddItem(new MenuItem("DontRbuffZilean", "牛頭大招").SetValue(true));
+            Menu.SubMenu("Rsettings").SubMenu("DontRbuff").AddItem(new MenuItem("DontRbuffZac", "紮克被動").SetValue(true));
+            Menu.SubMenu("Rsettings").SubMenu("DontRbuff").AddItem(new MenuItem("DontRbuffAttrox", "劍魔被動").SetValue(true));
+            Menu.SubMenu("Rsettings").SubMenu("DontRbuff").AddItem(new MenuItem("DontRbuffSivir", "輪子媽法術護盾").SetValue(true));
+            Menu.SubMenu("Rsettings").SubMenu("DontRbuff").AddItem(new MenuItem("DontRbuffMorgana", "莫甘娜暗之盾").SetValue(true));
+            Menu.SubMenu("Rsettings").AddSubMenu(new Menu("R 擊殺 提示", "okR"));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
                 Menu.SubMenu("Rsettings").SubMenu("okR").AddItem(new MenuItem("okR" + enemy.BaseSkinName, enemy.BaseSkinName).SetValue(new Slider(0, 0, 100)));
 
+            //Drawings
             Menu.AddSubMenu(new Menu("範圍", "Drawing"));
             Menu.SubMenu("Drawing").AddItem(new MenuItem("DrawQ", "Q 範圍").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
             Menu.SubMenu("Drawing").AddItem(new MenuItem("DrawW", "W 範圍").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
@@ -200,6 +216,8 @@ namespace GagongSyndra
             //Add main menu
             Menu.AddToMainMenu();
             if (Menu.Item("Sound1").GetValue<bool>()) playSound(welcome);
+            GameObject.OnCreate += OnCreate;
+            GameObject.OnDelete += OnDelete;
             Game.OnGameUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
@@ -233,6 +251,63 @@ namespace GagongSyndra
                 lanefreezeKey = Menu.Item("LaneFreeze_Key");
                 Game.PrintChat("xSLx Orbwalker Loaded");
             }
+        }
+        private static void OnCreate(GameObject obj, EventArgs args)
+        {
+            if (Player.Distance(obj.Position) < 1500)
+            {
+                //Yasuo Wall
+                if (obj != null && obj.IsValid &&
+                    System.Text.RegularExpressions.Regex.IsMatch(
+                        obj.Name, "_w_windwall.\\.troy",
+                        System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                {
+                    YasuoWall = obj;
+                }
+
+            }
+        }
+        private static void OnDelete(GameObject obj, EventArgs args)
+        {
+            if (Player.Distance(obj.Position) < 1500)
+            {
+                //Yasuo Wall
+                if (obj != null && obj.IsValid && System.Text.RegularExpressions.Regex.IsMatch(
+                        obj.Name, "_w_windwall.\\.troy",
+                        System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                {
+                    YasuoWall = null;
+                }
+
+            }
+        }
+        private static bool detectCollision(Obj_AI_Hero target)
+        {
+            if (YasuoWall==null || !Menu.Item("YasuoWall").GetValue<bool>())
+            {
+                return true;
+            }
+            else
+            {
+                var level = YasuoWall.Name.Substring(YasuoWall.Name.Length - 6, 1);
+                var wallWidth = (300 + 50 * Convert.ToInt32(level));
+                var wallDirection = (YasuoWall.Position.To2D() - YasuoWallCastedPos).Normalized().Perpendicular();
+                var wallStart = YasuoWall.Position.To2D() + wallWidth / 2 * wallDirection;
+                var wallEnd = wallStart - wallWidth * wallDirection;
+
+                var intersection = Geometry.Intersection(wallStart, wallEnd, Player.Position.To2D(), target.Position.To2D());
+                var intersections = new List<Vector2>();
+
+                if (intersection.Point.IsValid() && Environment.TickCount + Game.Ping + R.Delay - WallCastT < 4000)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+             
         }
         private static void playSound(SoundPlayer sound = null)
         {
@@ -310,12 +385,13 @@ namespace GagongSyndra
             if (comboKey.GetValue<KeyBind>().Active)
             {
                 Combo();
+                
             }
             
             //Harass
             else if (harassKey.GetValue<KeyBind>().Active || Menu.Item("HarassActiveT").GetValue<KeyBind>().Active)
             {
-                if (Menu.Item("HarassTurret").GetValue<bool>())
+                if (Menu.Item("HarassTurret").GetValue<bool>() && !harassKey.GetValue<KeyBind>().Active)
                 {
                     var turret = ObjectManager.Get<Obj_AI_Turret>().FirstOrDefault(t => t.IsValidTarget(Q.Range));
                     if (turret == null) Harass();
@@ -464,6 +540,11 @@ namespace GagongSyndra
             if (Menu.Item("HarassAAQ").GetValue<bool>() && sender.Type == Player.Type && sender.Team != Player.Team && args.SData.Name.ToLower().Contains("attack") && Player.Distance(sender, true) <= Math.Pow(Q.Range, 2) && Player.Mana / Player.MaxMana * 100 > Menu.Item("HarassMana").GetValue<Slider>().Value)  
             {
                 UseQ((Obj_AI_Hero)sender);
+            }
+            if (sender.IsValid && sender.Team != ObjectManager.Player.Team && args.SData.Name == "YasuoWMovingWall")
+            {
+                WallCastT = Environment.TickCount;
+                YasuoWallCastedPos = sender.ServerPosition.To2D();
             }
         }
         
@@ -659,7 +740,7 @@ namespace GagongSyndra
                         && Player.Distance(ePos.UnitPosition, true) <= Math.Pow(Q.Range + 25f + 395, 2) && Player.Distance(ePos.UnitPosition, true) > Math.Pow(Q.Range + 25f + 200, 2))
 
                     if ((GetComboDamage(enemy, Menu.Item("UseQKS").GetValue<bool>(), false, Menu.Item("UseEKS").GetValue<bool>(), false, false) > enemy.Health && Menu.Item("UseFK1").GetValue<bool>())
-                        || (GetComboDamage(enemy, false, false, false, Menu.Item("UseRKS").GetValue<bool>()) > enemy.Health && Menu.Item("UseFK2").GetValue<bool>() && Player.Distance(ePos.UnitPosition, true) <= Math.Pow(R.Range + 390, 2) && Environment.TickCount-R.LastCastAttemptT>Game.Ping + 150 && Player.Distance(ePos.UnitPosition, true) > Math.Pow(R.Range + 200, 2)))
+                        || (GetComboDamage(enemy, false, false, false, Menu.Item("UseRKS").GetValue<bool>()) > enemy.Health && Menu.Item("UseFK2").GetValue<bool>() && Player.Distance(ePos.UnitPosition, true) <= Math.Pow(R.Range + 390, 2) && Environment.TickCount - R.LastCastAttemptT > Game.Ping + 750 && Environment.TickCount - QE.LastCastAttemptT > Game.Ping + 750 && Player.Distance(ePos.UnitPosition, true) > Math.Pow(R.Range + 200, 2)))
                     {
                         var totmana = 0d;
                         if (Menu.Item("FKMANA").GetValue<bool>())
@@ -702,7 +783,21 @@ namespace GagongSyndra
 
                 }
         }
+        private static bool buffCheck(Obj_AI_Hero enemy)
+        {
+            int buff = 0;
+            if (enemy.HasBuff("UndyingRage") && Menu.Item("DontRbuffUndying").GetValue<bool>()) buff++;
+            if (enemy.HasBuff("JudicatorIntervention") && Menu.Item("DontRbuffJudicator").GetValue<bool>()) buff++; 
+            if (enemy.HasBuff("ZacRebirthReady") && Menu.Item("DontRbuffZac").GetValue<bool>()) buff++;  
+            if (enemy.HasBuff("AttroxPassiveReady") && Menu.Item("DontRbuffAttrox").GetValue<bool>()) buff++;  
+            if (enemy.HasBuff("Spell Shield") && Menu.Item("DontRbuffSivir").GetValue<bool>()) buff++;  
+            if (enemy.HasBuff("Black Shield") && Menu.Item("DontRbuffMorgana").GetValue<bool>()) buff++;
+            if (enemy.HasBuff("Chrono Shift") && Menu.Item("DontRbuffZilean").GetValue<bool>()) buff++;
+            if (enemy.HasBuff("Ferocious Howl") && Menu.Item("DontRbuffAlistar").GetValue<bool>()) buff++;
 
+            if (buff > 0) return false;
+            else return true;
+        }
         private static void UseSpells(bool UQ, bool UW, bool UE, bool UR, bool UQE)
         {   
             //Set Target
@@ -711,17 +806,16 @@ namespace GagongSyndra
             var RTarget = SimpleTs.GetTarget(R.Range, SimpleTs.DamageType.Magical);
             var QETarget = SimpleTs.GetTarget(QE.Range, SimpleTs.DamageType.Magical);
             bool UseR = false;
-            
             //Use DFG
-            if (DFG.IsReady() && RTarget != null && GetComboDamage(RTarget, UQ, UW, UE, UR) + GetIgniteDamage(RTarget) > RTarget.Health)
+            if (DFG.IsReady() && RTarget != null && GetComboDamage(RTarget, UQ, UW, UE, UR) + GetIgniteDamage(RTarget) > RTarget.Health && detectCollision(RTarget))
             {
                 //DFG
                 if (Player.Distance(RTarget, true) <= Math.Pow(DFG.Range, 2) && GetComboDamage(RTarget, UQ, UW, UE, false, false) + GetIgniteDamage(QTarget) < RTarget.Health)
                     if((UR && R.IsReady()) || (UQ && Q.IsReady())) DFG.Cast(RTarget);
             }
-            
+           
             //Harass Combo Key Override
-            if (RTarget != null && (harassKey.GetValue<KeyBind>().Active || laneclearKey.GetValue<KeyBind>().Active) && comboKey.GetValue<KeyBind>().Active && Player.Distance(RTarget, true) <= Math.Pow(R.Range, 2) && !RTarget.HasBuff("UndyingRage") && !RTarget.HasBuff("JudicatorIntervention"))
+            if (RTarget != null && (harassKey.GetValue<KeyBind>().Active || laneclearKey.GetValue<KeyBind>().Active) && comboKey.GetValue<KeyBind>().Active && Player.Distance(RTarget, true) <= Math.Pow(R.Range, 2) && buffCheck(RTarget) && detectCollision(RTarget))
             {
                     DFG.Cast(QTarget);
                     if (Menu.Item("DontR" + RTarget.BaseSkinName) != null && Menu.Item("DontR" + RTarget.BaseSkinName).GetValue<bool>() == false && UR)
@@ -733,12 +827,12 @@ namespace GagongSyndra
 
             //R, Ignite 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team && enemy.Distance(Player) <= R.Range && !enemy.IsDead))
-                if (!enemy.HasBuff("UndyingRage") && !enemy.HasBuff("JudicatorIntervention"))
+                if (buffCheck(enemy))
                 {
                     //R
                     UseR = Menu.Item("DontR" + enemy.BaseSkinName).GetValue<bool>() == false && UR;
                     var okR = Menu.Item("okR" + enemy.BaseSkinName).GetValue<Slider>().Value * .01 + 1;
-                    if (UseR && Player.Distance(enemy, true) <= Math.Pow(R.Range, 2) && (DFGBuff(enemy) ? GetRDamage(enemy) * 1.2 : GetRDamage(enemy)) > enemy.Health * okR && RCheck(enemy))
+                    if (detectCollision(enemy) && UseR && Player.Distance(enemy, true) <= Math.Pow(R.Range, 2) && (DFGBuff(enemy) ? GetRDamage(enemy) * 1.2 : GetRDamage(enemy)) > enemy.Health * okR && RCheck(enemy))
                     {
                         if (!(Player.GetSpellDamage(enemy, SpellSlot.Q) > enemy.Health && Player.Spellbook.GetSpell(SpellSlot.Q).CooldownExpires - Game.Time < 2 && Player.Spellbook.GetSpell(SpellSlot.Q).CooldownExpires - Game.Time >= 0 && enemy.IsStunned) && Environment.TickCount - Q.LastCastAttemptT > 500 + Game.Ping)
                         {
@@ -751,13 +845,13 @@ namespace GagongSyndra
                     if (Player.Distance(enemy, true) <= 600 * 600 && GetIgniteDamage(enemy) > enemy.Health)
                         if (Menu.Item("IgniteALLCD").GetValue<bool>())
                         {
-                            if (!Q.IsReady() && !W.IsReady() && !E.IsReady() && !R.IsReady()) Player.SummonerSpellbook.CastSpell(IgniteSlot, enemy);
+                            if (!Q.IsReady() && !W.IsReady() && !E.IsReady() && !R.IsReady() && Environment.TickCount - R.LastCastAttemptT > Game.Ping + 750 && Environment.TickCount - QE.LastCastAttemptT > Game.Ping + 750 && Environment.TickCount - W.LastCastAttemptT > Game.Ping + 750) Player.SummonerSpellbook.CastSpell(IgniteSlot, enemy);
                         }
                         else Player.SummonerSpellbook.CastSpell(IgniteSlot, enemy);
                 }
-           
+            
             //Use QE
-            if (UQE && QETarget != null && Q.IsReady() && (E.IsReady() || (Player.Spellbook.GetSpell(SpellSlot.E).CooldownExpires - Game.Time < 1 && Player.Spellbook.GetSpell(SpellSlot.E).Level > 0)) && Player.Spellbook.GetSpell(SpellSlot.Q).ManaCost + Player.Spellbook.GetSpell(SpellSlot.E).ManaCost <= Player.Mana)
+            if (UQE && detectCollision(QETarget) && QETarget != null && Q.IsReady() && (E.IsReady() || (Player.Spellbook.GetSpell(SpellSlot.E).CooldownExpires - Game.Time < 1 && Player.Spellbook.GetSpell(SpellSlot.E).Level > 0)) && Player.Spellbook.GetSpell(SpellSlot.Q).ManaCost + Player.Spellbook.GetSpell(SpellSlot.E).ManaCost <= Player.Mana)
             {
                 UseQE(QETarget);
             }
@@ -779,7 +873,7 @@ namespace GagongSyndra
                             UseE(enemy);
                 }
             //Use W
-            if (UW) UseW(QETarget, WTarget);
+            if (UW) UseW(QETarget, WTarget); 
         }
         private static Vector3 GetGrabableObjectPos(bool onlyOrbs)
         {
@@ -804,13 +898,13 @@ namespace GagongSyndra
             {
                 Vector3 gObjectPos = GetGrabableObjectPos(false);
 
-                if (gObjectPos.To2D().IsValid() && Environment.TickCount - Q.LastCastAttemptT > Game.Ping && Environment.TickCount - E.LastCastAttemptT > 750 + Game.Ping && Environment.TickCount - W.LastCastAttemptT > 600 + Game.Ping)
+                if (gObjectPos.To2D().IsValid() && Environment.TickCount - Q.LastCastAttemptT > Game.Ping + 150 && Environment.TickCount - E.LastCastAttemptT > 750 + Game.Ping && Environment.TickCount - W.LastCastAttemptT > 750 + Game.Ping)
                 {
                     bool grabsomething = false;
                     if (WTarget != null)
                     {
                         PredictionOutput Pos2 = W.GetPrediction(WTarget, true);
-                        if (Pos2.Hitchance >= HitChance.Low) grabsomething = true;
+                        if (Pos2.Hitchance >= HitChance.High) grabsomething = true;
                     }
                     if (grabsomething || QETarget.IsStunned)
                         W.Cast(gObjectPos, Menu.Item("Packets").GetValue<bool>());
@@ -843,11 +937,11 @@ namespace GagongSyndra
         private static void UseQE(Obj_AI_Hero Target)
         {
             if (!Q.IsReady() || !E.IsReady()) return;
-            Vector3 SPos = Prediction.GetPrediction(Target, E.Delay).UnitPosition;
+            Vector3 SPos = Prediction.GetPrediction(Target, Q.Delay + E.Delay).UnitPosition;
             if (Player.Distance(SPos, true) > Math.Pow(E.Range, 2))
             {
                 Vector3 orb = Player.ServerPosition + Vector3.Normalize(SPos - Player.ServerPosition) * E.Range;
-                QE.Delay = E.Delay + Player.Distance(orb) / E.Speed;
+                QE.Delay = Q.Delay + E.Delay + Player.Distance(orb) / E.Speed;
                 var TPos = QE.GetPrediction(Target);
                 if (TPos.Hitchance >= HitChance.Medium)
                 {
@@ -856,7 +950,9 @@ namespace GagongSyndra
             }
             else
             {
+                Q.Width = 40f;
                 PredictionOutput Pos = Q.GetPrediction(Target, true);
+                Q.Width = 125f;
                 if (Pos.Hitchance >= HitChance.VeryHigh)
                     UseQE2(Target, Pos.UnitPosition);
             }
@@ -867,7 +963,7 @@ namespace GagongSyndra
             {
                 Vector3 SP = Pos + Vector3.Normalize(Player.ServerPosition - Pos) * 100f;
                 Vector3 EP = Pos + Vector3.Normalize(Pos - Player.ServerPosition) * 592;
-                QE.Delay = E.Delay + Player.ServerPosition.Distance(Pos) / E.Speed;
+                QE.Delay = Q.Delay + E.Delay + Player.ServerPosition.Distance(Pos) / E.Speed;
                 QE.UpdateSourcePosition(Pos);
                 var PPo = QE.GetPrediction(Target).UnitPosition.To2D().ProjectOn(SP.To2D(), EP.To2D());
                 if (PPo.IsOnSegment && PPo.SegmentPoint.Distance(Target, true) <= Math.Pow(QE.Width + Target.BoundingRadius, 2))
@@ -962,12 +1058,12 @@ namespace GagongSyndra
             // Draw QE MAP
             if (Menu.Item("DrawQEMAP").GetValue<bool>()) { 
                 var QETarget = SimpleTs.GetTarget(QE.Range, SimpleTs.DamageType.Magical);
-                Vector3 SPos = Prediction.GetPrediction(QETarget, E.Delay).UnitPosition;
+                Vector3 SPos = Prediction.GetPrediction(QETarget, Q.Delay + E.Delay).UnitPosition;
                 if (Player.Distance(SPos, true) > Math.Pow(E.Range, 2) && (E.IsReady() || Player.Spellbook.GetSpell(SpellSlot.E).CooldownExpires - Game.Time < 2) && Player.Spellbook.GetSpell(SpellSlot.E).Level>0)
                 {
                     Color color = Color.Red;
                     Vector3 orb = Player.Position + Vector3.Normalize(SPos - Player.Position) * E.Range;
-                    QE.Delay = E.Delay + Player.Distance(orb) / E.Speed;
+                    QE.Delay = Q.Delay + E.Delay + Player.Distance(orb) / E.Speed;
                     var TPos = QE.GetPrediction(QETarget);
                     if (TPos.Hitchance >= HitChance.Medium) color = Color.Green;
                     if(Player.Spellbook.GetSpell(SpellSlot.Q).ManaCost + Player.Spellbook.GetSpell(SpellSlot.E).ManaCost > Player.Mana) color = Color.DarkBlue;
