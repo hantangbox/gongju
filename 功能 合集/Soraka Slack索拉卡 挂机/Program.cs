@@ -148,7 +148,7 @@ namespace TeachingLeagueSharp
                 new ItemToShop
                 {
                     goldReach = 180,
-                    itemsMustHave = new List<int> { 1033, 1004, 1004 },
+                    itemsMustHave = new List<int> { 1003, 1004, 1004 },
                     itemIds = new List<int> { 3028 }
                 },
                 new ItemToShop
