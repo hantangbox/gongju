@@ -1400,6 +1400,32 @@ namespace Evade
 
             #endregion Jinx
 
+            #region Kalista
+
+            Spells.Add(
+                new SpellData
+                {
+                    ChampionName = "Kalista",
+                    SpellName = "KalistaMysticShot",
+                    Slot = SpellSlot.Q,
+                    Type = SkillShotType.SkillshotMissileLine,
+                    Delay = 250,
+                    Range = 1200,
+                    Radius = 40,
+                    MissileSpeed = 1700,
+                    FixedRange = true,
+                    AddHitbox = true,
+                    DangerValue = 2,
+                    IsDangerous = false,
+                    MissileSpellName = "kalistamysticshotmis",
+                    ExtraMissileNames = new[] { "kalistamysticshotmistrue" },
+                    CanBeRemoved = true,
+                    CollisionObjects =
+                        new[] { CollisionObjectTypes.Champions, CollisionObjectTypes.Minion, CollisionObjectTypes.YasuoWall },
+                });
+
+            #endregion Kalista
+
             #region Karma
 
             Spells.Add(
@@ -2608,7 +2634,7 @@ namespace Evade
                 new SpellData
                 {
                     ChampionName = "Sona",
-                    SpellName = "SonaCrescendo",
+                    SpellName = "SonaR",
                     Slot = SpellSlot.R,
                     Type = SkillShotType.SkillshotMissileLine,
                     Delay = 250,
@@ -2619,7 +2645,7 @@ namespace Evade
                     AddHitbox = true,
                     DangerValue = 5,
                     IsDangerous = true,
-                    MissileSpellName = "SonaCrescendo",
+                    MissileSpellName = "SonaR",
                     CollisionObjects = new[] { CollisionObjectTypes.YasuoWall },
                 });
 
