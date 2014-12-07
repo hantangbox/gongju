@@ -103,7 +103,7 @@ namespace UniversalRecallTracker
             {
                 s = "<font color='#d8d8d8'>[" + Utils.FormatTime(Game.ClockTime) + "]</font> ";
             }
-            s += "<font color='#ff3232'>Universal</font><font color='#BABABA'>鍥炵▼杩借釜:</font> <font color='#FFFFFF'>" + msg + "鍔犺浇鎴愬姛!姹夊寲by浜岀嫍!QQ缇361630847</font>";
+            s += "<font color='#ff3232'>Universal</font><font color='#BABABA'>鍥炵▼杩借釜鍔犺浇鎴愬姛!姹夊寲by浜岀嫍!QQ缇361630847</font>:</font> <font color='#FFFFFF'>" + msg + </font>";
             Game.PrintChat(s);
         }
 
