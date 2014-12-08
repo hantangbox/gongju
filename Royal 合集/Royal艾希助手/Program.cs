@@ -35,7 +35,7 @@ namespace RoyalAsheHelper
             Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
             Orbwalking.AfterAttack += AfterAttack;
             Orbwalking.BeforeAttack += BeforeAttack;
-            Game.PrintChat("Royal?????? ??????!???by???!QQ??361630847");
+            Game.PrintChat("Roya鑹惧笇-鍔╂墜 鍔犺浇鎴愬姛!姹夊寲by浜岀嫍 QQ缇361630847");
         }
 
         static void AfterAttack(Obj_AI_Base unit, Obj_AI_Base target)
@@ -146,36 +146,36 @@ namespace RoyalAsheHelper
         static void LoadMenu()
         {
             // Initialize the menu
-            menu = new Menu("Royal??-??", "Ashe", true);
+            menu = new Menu("Royal艾希-助手", "Ashe", true);
 
             // Target selector
-            Menu targetSelector = new Menu("?? ??", "ts");
+            Menu targetSelector = new Menu("目标 选择", "ts");
             SimpleTs.AddToMenu(targetSelector);
             menu.AddSubMenu(targetSelector);
 
             // Orbwalker
-            Menu orbwalker = new Menu("??", "orbwalker");
+            Menu orbwalker = new Menu("走砍", "orbwalker");
             SOW = new Orbwalking.Orbwalker(orbwalker);
             menu.AddSubMenu(orbwalker);
 
             // Combo
-            Menu combo = new Menu("??", "combo");
+            Menu combo = new Menu("连招", "combo");
             menu.AddSubMenu(combo);
-            combo.AddItem(new MenuItem("UseQ", "?? Q").SetValue(true));
-            combo.AddItem(new MenuItem("UseW", "?? W").SetValue(true));
-            combo.AddItem(new MenuItem("UseR", "?? R").SetValue(true));
+            combo.AddItem(new MenuItem("UseQ", "使用 Q").SetValue(true));
+            combo.AddItem(new MenuItem("UseW", "使用 W").SetValue(true));
+            combo.AddItem(new MenuItem("UseR", "使用 R").SetValue(true));
 
             // Harass
-            Menu harass = new Menu("??", "harass");
+            Menu harass = new Menu("骚扰", "harass");
             menu.AddSubMenu(harass);
-            harass.AddItem(new MenuItem("UseW", "?? W").SetValue(true));
+            harass.AddItem(new MenuItem("UseW", "使用 W").SetValue(true));
 
-            Menu misc = new Menu("??", "misc");
+            Menu misc = new Menu("杂项", "misc");
             menu.AddSubMenu(misc);
-            misc.AddItem(new MenuItem("interrupt", "????").SetValue(true));
-            misc.AddItem(new MenuItem("exploit", "Q (????)").SetValue(false));
+            misc.AddItem(new MenuItem("interrupt", "中断法术").SetValue(true));
+            misc.AddItem(new MenuItem("exploit", "Q (利用漏洞 无蓝)").SetValue(false));
             //misc.AddItem(new MenuItem("interruptLevel", "Interrupt only with danger level").SetValue<InterruptableDangerLevel>(InterruptableDangerLevel.Medium));
-            misc.AddItem(new MenuItem("antigapcloser", "????").SetValue(true));
+            misc.AddItem(new MenuItem("antigapcloser", "防止突进").SetValue(true));
 
             // Finalize menu
             menu.AddToMainMenu();
