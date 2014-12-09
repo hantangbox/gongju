@@ -1,0 +1,2 @@
+D:\我的文档\GitHub\Ergou\功能 合集\UniversalRecallTracker 回程追踪\obj\Release\UniversalRecallTracker.Properties.Resources.resources
+D:\我的文档\GitHub\Ergou\功能 合集\UniversalRecallTracker 回程追踪\obj\Release\RecallTracker 回程 追踪.csproj.GenerateResource.Cache

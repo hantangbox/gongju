@@ -49,7 +49,7 @@ namespace xSaliceReligionAIO.Champions
             //Combo menu:
             var combo = new Menu("连招", "Combo");
             {
-                combo.AddItem(new MenuItem("selected", "攻击 选定目标").SetValue(true));
+                combo.AddItem(new MenuItem("selected", "攻击Z选定目标").SetValue(true));
                 combo.AddItem(new MenuItem("UseQCombo", "使用 Q").SetValue(true));
                 combo.AddItem(new MenuItem("UseWCombo", "使用 W").SetValue(true));
                 combo.AddItem(new MenuItem("UseECombo", "使用 E").SetValue(true));
