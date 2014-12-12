@@ -70,7 +70,7 @@ namespace DevBrand
 
                 InitializeAttachEvents();
 
-                Game.PrintChat(string.Format("<font color='#fb762d'>Dev鐏敺 鍔犺級鎴愬姛! v{0}姹夊寲by浜岀嫍!QQ缇361630847</font>", Assembly.GetExecutingAssembly().GetName().Version));
+                Game.PrintChat(string.Format("<font color='#fb762d'>Dev鐏敺|v{0} 鍔犺級鎴愬姛锛佹饥鍖朾y鑺辫竟  浜岀嫍QQ缇361630847 </font>", Assembly.GetExecutingAssembly().GetName().Version));
 
                 assemblyUtil = new AssemblyUtil(Assembly.GetExecutingAssembly().GetName().Name);
                 assemblyUtil.onGetVersionCompleted += AssemblyUtil_onGetVersionCompleted;
@@ -85,7 +85,7 @@ namespace DevBrand
         static void AssemblyUtil_onGetVersionCompleted(OnGetVersionCompletedArgs args)
         {
             if (args.LastAssemblyVersion == Assembly.GetExecutingAssembly().GetName().Version.ToString())
-                Game.PrintChat(string.Format("<font color='#fb762d'>DevBrand You have the lastest version.</font>"));
+                Game.PrintChat(string.Format("<font color='#fb762d'>DevBrand You have the latest version.</font>"));
             else
                 Game.PrintChat(string.Format("<font color='#fb762d'>DevBrand NEW VERSION available! Tap F8 for Update! {0}</font>", args.LastAssemblyVersion));
         }
@@ -200,11 +200,13 @@ namespace DevBrand
             }
 
             // Passive UP +1 enemy Combo
-            var query = DevHelper.GetEnemyList()
-                .Where(x => x.IsValidTarget(R.Range) && HasPassiveBuff(x) && Player.GetSpellDamage(x, SpellSlot.R) > x.Health).OrderBy(x => x.Health);
-            if (query.Any() && R.IsReady())
+            if (useR && R.IsReady())
             {
-                R.CastOnUnit(query.First(), packetCast);
+                var query = DevHelper.GetEnemyList()
+                            .Where(x => x.IsValidTarget(R.Range) && HasPassiveBuff(x) && Player.GetSpellDamage(x, SpellSlot.R) > x.Health).OrderBy(x => x.Health);
+
+                if (query.Any())
+                    R.CastOnUnit(query.First(), packetCast);
             }
 
 
@@ -228,6 +230,7 @@ namespace DevBrand
                 }
             }
 
+            // R min enemies
             if (R.IsReady() && useR && eTarget.IsValidTarget(R.Range))
             {
                 var enemiesInRange = DevHelper.GetEnemyList().Where(x => x.Distance(eTarget) < 400);
@@ -511,56 +514,56 @@ namespace DevBrand
 
         private static void InitializeMainMenu()
         {
-            Config = new Menu("Dev火男", "DevBrand", true);
+             Config = new Menu("DEV 火 男", "DevBrand", true);
 
-            var targetSelectorMenu = new Menu("目标选择", "Target Selector");
+            var targetSelectorMenu = new Menu("目標 選擇", "Target Selector");
             SimpleTs.AddToMenu(targetSelectorMenu);
             Config.AddSubMenu(targetSelectorMenu);
 
-            Config.AddSubMenu(new Menu("走砍", "Orbwalking"));
+            Config.AddSubMenu(new Menu("走 砍", "Orbwalking"));
             Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
 
-            Config.AddSubMenu(new Menu("连招", "Combo"));
+            Config.AddSubMenu(new Menu("連 招", "Combo"));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "使用 Q").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "使用 W").SetValue(true));
-            Config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "使用E").SetValue(true));
+            Config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "使用 E").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "使用 R").SetValue(true));
-            Config.SubMenu("Combo").AddItem(new MenuItem("UseIgnite", "使用 点燃").SetValue(true));
-            Config.SubMenu("Combo").AddItem(new MenuItem("UseRMinEnemies", "使用R敌方人数").SetValue(new Slider(2, 1, 5)));
-            Config.SubMenu("Combo").AddItem(new MenuItem("PriorizeStunCombo", "自动Q眩晕").SetValue(true));
+            Config.SubMenu("Combo").AddItem(new MenuItem("UseIgnite", "使用 點燃").SetValue(true));
+            Config.SubMenu("Combo").AddItem(new MenuItem("UseRMinEnemies", "最少 對 幾個人 放R").SetValue(new Slider(2, 1, 5)));
+            Config.SubMenu("Combo").AddItem(new MenuItem("PriorizeStunCombo", "自動 用Q 眩暈").SetValue(true));
 
-            Config.AddSubMenu(new Menu("骚扰", "Harass"));
+            Config.AddSubMenu(new Menu("騷 擾", "Harass"));
             Config.SubMenu("Harass").AddItem(new MenuItem("UseQHarass", "使用 Q").SetValue(true));
             Config.SubMenu("Harass").AddItem(new MenuItem("UseWHarass", "使用 W").SetValue(true));
             Config.SubMenu("Harass").AddItem(new MenuItem("UseEHarass", "使用 E").SetValue(true));
-            Config.SubMenu("Harass").AddItem(new MenuItem("PriorizeStunHarass", "自动Q眩晕").SetValue(true));
+            Config.SubMenu("Harass").AddItem(new MenuItem("PriorizeStunHarass", "自動 用Q 眩暈").SetValue(true));
 
-            Config.AddSubMenu(new Menu("清野", "LaneClear"));
-            //Config.SubMenu("LaneClear").AddItem(new MenuItem("UseQLaneClear", "Use Q").SetValue(false));
+            Config.AddSubMenu(new Menu("清 線", "LaneClear"));
+            //Config.SubMenu("LaneClear").AddItem(new MenuItem("UseQLaneClear", "使用 Q").SetValue(false));
             Config.SubMenu("LaneClear").AddItem(new MenuItem("UseWLaneClear", "使用 W").SetValue(true));
             Config.SubMenu("LaneClear").AddItem(new MenuItem("UseELaneClear", "使用 E").SetValue(true));
-            Config.SubMenu("LaneClear").AddItem(new MenuItem("ManaLaneClear", "清线最低蓝量").SetValue(new Slider(30, 1, 100)));
+            Config.SubMenu("LaneClear").AddItem(new MenuItem("ManaLaneClear", "最低 法力 清線").SetValue(new Slider(30, 1, 100)));
 
-            Config.AddSubMenu(new Menu("杂项", "Misc"));
+            Config.AddSubMenu(new Menu("雜 項", "Misc"));
             Config.SubMenu("Misc").AddItem(new MenuItem("PacketCast", "使用 封包").SetValue(true));
 
-            Config.AddSubMenu(new Menu("抢人头", "KillSteal"));
-            Config.SubMenu("KillSteal").AddItem(new MenuItem("KillSteal", "抢人头").SetValue(true));
+            Config.AddSubMenu(new Menu("搶 人 頭", "KillSteal"));
+            Config.SubMenu("KillSteal").AddItem(new MenuItem("KillSteal", "搶 人 頭").SetValue(true));
             Config.SubMenu("KillSteal").AddItem(new MenuItem("UseQKillSteal", "使用 Q").SetValue(true));
             Config.SubMenu("KillSteal").AddItem(new MenuItem("UseWKillSteal", "使用 W").SetValue(true));
             Config.SubMenu("KillSteal").AddItem(new MenuItem("UseEKillSteal", "使用 E").SetValue(true));
             Config.SubMenu("KillSteal").AddItem(new MenuItem("UseRKillSteal", "使用 R").SetValue(true));
 
-            Config.AddSubMenu(new Menu("突进终结者", "GapCloser"));
-            Config.SubMenu("GapCloser").AddItem(new MenuItem("BarrierGapCloser", "阻断突进者").SetValue(true));
-            Config.SubMenu("GapCloser").AddItem(new MenuItem("BarrierGapCloserMinHealth", "阻断突进者|最少血量").SetValue(new Slider(40, 0, 100)));
+            Config.AddSubMenu(new Menu("阻止 突進", "GapCloser"));
+            Config.SubMenu("GapCloser").AddItem(new MenuItem("BarrierGapCloser", "阻止 突進").SetValue(true));
+            Config.SubMenu("GapCloser").AddItem(new MenuItem("BarrierGapCloserMinHealth", "最低 血量 開啟").SetValue(new Slider(40, 0, 100)));
 
-            Config.AddSubMenu(new Menu("范围", "Drawings"));
-            Config.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q 范围").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
-            Config.SubMenu("Drawings").AddItem(new MenuItem("WRange", "W 范围").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
-            Config.SubMenu("Drawings").AddItem(new MenuItem("ERange", "E 范围").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
-            Config.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R 范围").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
-            Config.SubMenu("Drawings").AddItem(new MenuItem("ComboDamage", "显示组合连招伤害").SetValue(true));
+            Config.AddSubMenu(new Menu("範 圍", "Drawings"));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q 範圍").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("WRange", "W 範圍").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("ERange", "E 範圍").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R 範圍").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("ComboDamage", "顯示 連招 傷害").SetValue(true));
 
             skinManager.AddToMenu(ref Config);
 

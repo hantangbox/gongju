@@ -74,7 +74,7 @@ namespace DevRyze
 
                 InitializeAttachEvents();
 
-                Game.PrintChat(string.Format("<font color='#fb762d'>Dev鐟炲吂 鍔犺級鎴愬姛! v{0}姹夊寲by浜岀嫍!QQ缇361630847</font>", Assembly.GetExecutingAssembly().GetName().Version));
+                Game.PrintChat(string.Format("<font color='#fb762d'>Dev鐟炲吂v{0} 鍔犺級鎴愬姛锛佹饥鍖朾y鑺辫竟  浜岀嫍QQ缇361630847</font>", Assembly.GetExecutingAssembly().GetName().Version));
 
                 assemblyUtil = new AssemblyUtil(Assembly.GetExecutingAssembly().GetName().Name);
                 assemblyUtil.onGetVersionCompleted += AssemblyUtil_onGetVersionCompleted;
@@ -91,7 +91,7 @@ namespace DevRyze
         static void AssemblyUtil_onGetVersionCompleted(OnGetVersionCompletedArgs args)
         {
             if (args.LastAssemblyVersion == Assembly.GetExecutingAssembly().GetName().Version.ToString())
-                Game.PrintChat(string.Format("<font color='#fb762d'>DevRyze You have the lastest version.</font>"));
+                Game.PrintChat(string.Format("<font color='#fb762d'>DevRyze You have the latest version.</font>"));
             else
                 Game.PrintChat(string.Format("<font color='#fb762d'>DevRyze NEW VERSION available! Tap F8 for Update! {0}</font>", args.LastAssemblyVersion));
         }
@@ -315,6 +315,8 @@ namespace DevRyze
                 var useW = Config.Item("UseWCombo").GetValue<bool>();
                 var useE = Config.Item("UseQCombo").GetValue<bool>();
 
+                args.Process = Config.Item("UseAACombo").GetValue<bool>();
+
                 if (Player.GetNearestEnemy().IsValidTarget(W.Range) && ((useQ && Q.IsReady()) || (useW && W.IsReady() || useE && E.IsReady())))
                     args.Process = false;
             }
@@ -328,6 +330,7 @@ namespace DevRyze
                 if (Player.GetNearestEnemy().IsValidTarget(W.Range) && ((useQ && Q.IsReady()) || (useW && W.IsReady() || useE && E.IsReady())))
                     args.Process = false;
             }
+
         }
 
         static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
@@ -741,63 +744,64 @@ namespace DevRyze
             if (mustDebug)
                 Game.PrintChat("InitializeMainMenu Start");
 
-            Config = new Menu("Dev瑞兹", "DevRyze", true);
+            Config = new Menu("Dev 瑞茲", "DevRyze", true);
 
-            var targetSelectorMenu = new Menu("目标选择", "Target Selector");
+            var targetSelectorMenu = new Menu("目標 選擇", "Target Selector");
             SimpleTs.AddToMenu(targetSelectorMenu);
             Config.AddSubMenu(targetSelectorMenu);
 
-            Config.AddSubMenu(new Menu("走砍", "Orbwalking"));
+            Config.AddSubMenu(new Menu("走 砍", "Orbwalking"));
             Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
 
-            Config.AddSubMenu(new Menu("连招", "Combo"));
-            Config.SubMenu("Combo").AddItem(new MenuItem("ComboKey", "连招!").SetValue(new KeyBind(Config.Item("Orbwalk").GetValue<KeyBind>().Key, KeyBindType.Press)));
+            Config.AddSubMenu(new Menu("連 招", "Combo"));
+            Config.SubMenu("Combo").AddItem(new MenuItem("ComboKey", "開 啟").SetValue(new KeyBind(Config.Item("Orbwalk").GetValue<KeyBind>().Key, KeyBindType.Press)));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "使用 Q").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "使用 W").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "使用 E").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "使用 R").SetValue(true));
-            Config.SubMenu("Combo").AddItem(new MenuItem("UseRComboToggle", "使用 R (自动)").SetValue(new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle)));
+            Config.SubMenu("Combo").AddItem(new MenuItem("UseAACombo", "使用 技能後 連招").SetValue(true));
+            Config.SubMenu("Combo").AddItem(new MenuItem("UseRComboToggle", "使用 R (連招效果)").SetValue(new KeyBind("G".ToCharArray()[0], KeyBindType.Toggle)));
 
-            Config.AddSubMenu(new Menu("骚扰", "Harass"));
-            Config.SubMenu("Harass").AddItem(new MenuItem("HarassKey", "骚扰!").SetValue(new KeyBind(Config.Item("Farm").GetValue<KeyBind>().Key, KeyBindType.Press)));
+            Config.AddSubMenu(new Menu("騷 擾", "Harass"));
+            Config.SubMenu("Harass").AddItem(new MenuItem("HarassKey", "開 啟").SetValue(new KeyBind(Config.Item("Farm").GetValue<KeyBind>().Key, KeyBindType.Press)));
             Config.SubMenu("Harass").AddItem(new MenuItem("UseQHarass", "使用 Q").SetValue(true));
             Config.SubMenu("Harass").AddItem(new MenuItem("UseWHarass", "使用 W").SetValue(false));
             Config.SubMenu("Harass").AddItem(new MenuItem("UseEHarass", "使用 E").SetValue(true));
-            Config.SubMenu("Harass").AddItem(new MenuItem("UseHarassAlways", "自动骚扰").SetValue(false));
+            Config.SubMenu("Harass").AddItem(new MenuItem("UseHarassAlways", "保持 騷擾 開啟").SetValue(false));
 
-            Config.AddSubMenu(new Menu("追逐敌人", "Chase"));
-            Config.SubMenu("Chase").AddItem(new MenuItem("ChaseKey", "追逐敌人!").SetValue(new KeyBind("A".ToCharArray()[0], KeyBindType.Press)));
+            Config.AddSubMenu(new Menu("追擊 敵人", "Chase"));
+            Config.SubMenu("Chase").AddItem(new MenuItem("ChaseKey", "開 啟").SetValue(new KeyBind("A".ToCharArray()[0], KeyBindType.Press)));
             Config.SubMenu("Chase").AddItem(new MenuItem("UseWChase", "使用 W").SetValue(true));
-            Config.SubMenu("Chase").AddItem(new MenuItem("UseFullComboAfterChase", "束缚后技能全交").SetValue(true));
+            Config.SubMenu("Chase").AddItem(new MenuItem("UseFullComboAfterChase", "技能全中後使用W").SetValue(true));
 
-            Config.AddSubMenu(new Menu("清线", "LaneClear")); 
-            Config.SubMenu("LaneClear").AddItem(new MenuItem("LaneClearKey", "清线!").SetValue(new KeyBind(Config.Item("LaneClear").GetValue<KeyBind>().Key, KeyBindType.Press)));
-            Config.SubMenu("LaneClear").AddItem(new MenuItem("UseLaneClearLastHit", "始终补刀").SetValue(false));
+            Config.AddSubMenu(new Menu("清 線", "LaneClear")); 
+            Config.SubMenu("LaneClear").AddItem(new MenuItem("LaneClearKey", "開 啟").SetValue(new KeyBind(Config.Item("LaneClear").GetValue<KeyBind>().Key, KeyBindType.Press)));
+            Config.SubMenu("LaneClear").AddItem(new MenuItem("UseLaneClearLastHit", "只補 最後一下").SetValue(false));
             Config.SubMenu("LaneClear").AddItem(new MenuItem("UseQLaneClear", "使用 Q").SetValue(true));
             Config.SubMenu("LaneClear").AddItem(new MenuItem("UseWLaneClear", "使用 W").SetValue(false));
             Config.SubMenu("LaneClear").AddItem(new MenuItem("UseELaneClear", "使用 E").SetValue(true));
-            Config.SubMenu("LaneClear").AddItem(new MenuItem("ManaLaneClear", "清线最低蓝量").SetValue(new Slider(40, 1, 100)));
+            Config.SubMenu("LaneClear").AddItem(new MenuItem("ManaLaneClear", "最低 藍量 清線").SetValue(new Slider(40, 1, 100)));
 
-            Config.AddSubMenu(new Menu("控线", "Freeze"));
-            Config.SubMenu("Freeze").AddItem(new MenuItem("FreezeKey", "混合!").SetValue(new KeyBind(Config.Item("LastHit").GetValue<KeyBind>().Key, KeyBindType.Press)));
-            Config.SubMenu("Freeze").AddItem(new MenuItem("UseQFreeze", "使用 Q 补刀").SetValue(false));
-            Config.SubMenu("Freeze").AddItem(new MenuItem("ManaFreeze", "使用Q最低蓝量").SetValue(new Slider(40, 1, 100)));
+            Config.AddSubMenu(new Menu("凍 結", "Freeze"));
+            Config.SubMenu("Freeze").AddItem(new MenuItem("FreezeKey", "開 啟").SetValue(new KeyBind(Config.Item("LastHit").GetValue<KeyBind>().Key, KeyBindType.Press)));
+            Config.SubMenu("Freeze").AddItem(new MenuItem("UseQFreeze", "最後一下用Q").SetValue(false));
+            Config.SubMenu("Freeze").AddItem(new MenuItem("ManaFreeze", "最低 藍量 Q").SetValue(new Slider(40, 1, 100)));
 
-            Config.AddSubMenu(new Menu("杂项", "Misc"));
+            Config.AddSubMenu(new Menu("雜項", "Misc"));
             Config.SubMenu("Misc").AddItem(new MenuItem("PacketCast", "使用 封包").SetValue(true));
-            Config.SubMenu("Misc").AddItem(new MenuItem("TearExploit", "刷女神之泪").SetValue(true));
+            Config.SubMenu("Misc").AddItem(new MenuItem("TearExploit", "使用 開發功能").SetValue(true));
 
-            Config.AddSubMenu(new Menu("突进终结者", "GapCloser"));
-            Config.SubMenu("GapCloser").AddItem(new MenuItem("BarrierGapCloser", "阻断突进者").SetValue(true));
-            Config.SubMenu("GapCloser").AddItem(new MenuItem("WGapCloser", "使用W防止突进").SetValue(true));
-            Config.SubMenu("GapCloser").AddItem(new MenuItem("WInterruptSpell", "使用W中断法术").SetValue(true));
+            Config.AddSubMenu(new Menu("防 突進", "GapCloser"));
+            Config.SubMenu("GapCloser").AddItem(new MenuItem("BarrierGapCloser", "防 突進").SetValue(true));
+            Config.SubMenu("GapCloser").AddItem(new MenuItem("WGapCloser", "W 防突進").SetValue(true));
+            Config.SubMenu("GapCloser").AddItem(new MenuItem("WInterruptSpell", "W 打斷").SetValue(true));
 
-            Config.AddSubMenu(new Menu("范围", "Drawings")); 
-            Config.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q 范围").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
-            Config.SubMenu("Drawings").AddItem(new MenuItem("WRange", "W 范围").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
-            Config.SubMenu("Drawings").AddItem(new MenuItem("ERange", "E 范围").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
-            Config.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R 范围").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
-            Config.SubMenu("Drawings").AddItem(new MenuItem("ComboDamage", "显示组合连招伤害").SetValue(true));
+            Config.AddSubMenu(new Menu("範圍", "Drawings")); 
+            Config.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q 範圍").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("WRange", "W 範圍").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("ERange", "E 範圍").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R 範圍").SetValue(new Circle(false, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("ComboDamage", "顯示 連招 傷害").SetValue(true));
 
             SkinManager.AddToMenu(ref Config);
 
