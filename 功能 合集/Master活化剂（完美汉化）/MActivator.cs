@@ -337,7 +337,7 @@ namespace MasterActivator
             if (useOn)
             {
 
-                Config.SubMenu(parent).AddItem(new MenuItem(item.menuVariable + "UseOnPercent", "最低使用" + (mana == false ? "生命值" : "魔法值"))).SetValue(new Slider(defaultValue, 0, 100));
+                Config.SubMenu(parent).AddItem(new MenuItem(item.menuVariable + "UseOnPercent", "Use on " + (mana == false ? "%HP" : "%Mana"))).SetValue(new Slider(defaultValue, 0, 100));
             }
         }
 
@@ -379,7 +379,7 @@ namespace MasterActivator
 
                                 foreach (Obj_AI_Hero hero in activeAllyHeros)
                                 {
-                                    int enemyInRange = Utility.CountEnemysInRange(700, hero);
+                                    int enemyInRange = Utility.CountEnemysInRange(hero, 700);
                                     if (enemyInRange >= 1)
                                     {
                                         int actualHeroHpPercent = (int)((hero.Health / hero.MaxHealth) * 100);
@@ -420,7 +420,7 @@ namespace MasterActivator
                                         }
                                         else if (item.type == ItemTypeId.Deffensive)
                                         {
-                                            int enemyInRange = Utility.CountEnemysInRange(700, hero);
+                                            int enemyInRange = Utility.CountEnemysInRange(hero, 700);
                                             if (enemyInRange >= 1)
                                             {
                                                 int usePercent = Config.Item(item.menuVariable + "UseOnPercent").GetValue<Slider>().Value;
