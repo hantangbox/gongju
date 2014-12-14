@@ -563,7 +563,7 @@ namespace DevCassio
 
                 InitializeAttachEvents();
 
-                Game.PrintChat(string.Format("<font color='#fb762d'>{0} 鍔犺級鎴愬姛! v{1}QQ缇361630847</font>", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetExecutingAssembly().GetName().Version));
+                Game.PrintChat(string.Format("<font color='#fb762d'>{0} Loaded v{1}</font>", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetExecutingAssembly().GetName().Version));
 
                 assemblyUtil = new AssemblyUtil(Assembly.GetExecutingAssembly().GetName().Name);
                 assemblyUtil.onGetVersionCompleted += AssemblyUtil_onGetVersionCompleted;
@@ -581,7 +581,7 @@ namespace DevCassio
         static void AssemblyUtil_onGetVersionCompleted(OnGetVersionCompletedArgs args)
         {
             if (args.LastAssemblyVersion == Assembly.GetExecutingAssembly().GetName().Version.ToString())
-                Game.PrintChat(string.Format("<font color='#fb762d'>DevCassio You have the lastest version.</font>"));
+                Game.PrintChat(string.Format("<font color='#fb762d'>DevCassio You have the latest version.</font>"));
             else
                 Game.PrintChat(string.Format("<font color='#fb762d'>DevCassio NEW VERSION available! Tap F8 for Update! {0}</font>", args.LastAssemblyVersion));
         }
@@ -633,7 +633,7 @@ namespace DevCassio
                 Game.PrintChat("InitializeSpells Start");
 
             Q = new Spell(SpellSlot.Q, 850);
-            Q.SetSkillshot(0.6f, 90, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.4f, 90, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             W = new Spell(SpellSlot.W, 850);
             W.SetSkillshot(0.5f, 150, 2500, false, SkillshotType.SkillshotCircle);
